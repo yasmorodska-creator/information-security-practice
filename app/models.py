@@ -60,3 +60,43 @@ class Permission(Base):
 
     def __repr__(self):
         return f"<Permission {self.name}>"
+    
+class Group(Base):
+    tablename = "groups"
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String(20), unique=True, nullable=False)
+    department = Column(String(100), nullable=False)
+    year = Column(Integer, nullable=False)
+    
+    students = relationship("User", back_populates="group")
+
+    def repr(self):
+        return f"<Group {self.name}>"
+
+class Subject(Base):
+    tablename = "subjects"
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String(150), nullable=False)
+    credits = Column(Float, nullable=False)
+    semester = Column(Integer, nullable=False)
+    
+    grades = relationship("Grade", back_populates="subject")
+
+    def repr(self):
+        return f"<Subject {self.name}>"
+
+class Grade(Base):
+    tablename = "grades"
+    id = Column(Integer, primary_key=True, index=True)
+    student_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    subject_id = Column(Integer, ForeignKey("subjects.id"), nullable=False)
+    grade = Column(Integer, nullable=False)
+    date_assigned = Column(DateTime, default=datetime.utcnow)
+    assigned_by = Column(Integer, ForeignKey("users.id"), nullable=False)
+    
+    student = relationship("User", back_populates="grades", foreign_keys=[student_id])
+    subject = relationship("Subject", back_populates="grades")
+    teacher = relationship("User", foreign_keys=[assigned_by])
+
+    def repr(self):
+        return f"<Grade student={self.student_id} subject={self.subject_id} grade={self.grade}>"
