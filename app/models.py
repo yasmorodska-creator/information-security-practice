@@ -60,9 +60,9 @@ class Permission(Base):
 
     def __repr__(self):
         return f"<Permission {self.name}>"
-    
+
 class Group(Base):
-    tablename = "groups"
+    __tablename__ = "groups"  # ÂÈÏĞÀÂËÅÍÎ: äîäàíî __
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String(20), unique=True, nullable=False)
     department = Column(String(100), nullable=False)
@@ -70,11 +70,11 @@ class Group(Base):
     
     students = relationship("User", back_populates="group")
 
-    def repr(self):
+    def __repr__(self):  # ÂÈÏĞÀÂËÅÍÎ: äîäàíî __
         return f"<Group {self.name}>"
 
 class Subject(Base):
-    tablename = "subjects"
+    __tablename__ = "subjects"  # ÂÈÏĞÀÂËÅÍÎ: äîäàíî __
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String(150), nullable=False)
     credits = Column(Float, nullable=False)
@@ -82,11 +82,11 @@ class Subject(Base):
     
     grades = relationship("Grade", back_populates="subject")
 
-    def repr(self):
+    def __repr__(self):  # ÂÈÏĞÀÂËÅÍÎ: äîäàíî __
         return f"<Subject {self.name}>"
 
 class Grade(Base):
-    tablename = "grades"
+    __tablename__ = "grades"  # ÂÈÏĞÀÂËÅÍÎ: äîäàíî __
     id = Column(Integer, primary_key=True, index=True)
     student_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     subject_id = Column(Integer, ForeignKey("subjects.id"), nullable=False)
@@ -98,5 +98,5 @@ class Grade(Base):
     subject = relationship("Subject", back_populates="grades")
     teacher = relationship("User", foreign_keys=[assigned_by])
 
-    def repr(self):
+    def __repr__(self):  # ÂÈÏĞÀÂËÅÍÎ: äîäàíî __
         return f"<Grade student={self.student_id} subject={self.subject_id} grade={self.grade}>"

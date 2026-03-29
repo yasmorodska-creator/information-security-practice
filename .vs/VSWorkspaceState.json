@@ -2,8 +2,8 @@
   "ExpandedNodes": [
     "",
     "\\alembic",
-    "\\App"
+    "\\app"
   ],
-  "SelectedNode": "\\alembic\\env.py",
+  "SelectedNode": "\\app\\seed.py",
   "PreviewInSolutionExplorer": false
 }
