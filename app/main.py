@@ -1,9 +1,11 @@
 ﻿from fastapi import FastAPI
 from app.database import Base, engine
 from app import models  # ★ Новий імпорт
+from app.routers import auth
 
 app = FastAPI(title="Electronic Dean's Office")
 
+app.include_router(auth.router)
 @app.get("/")
 def root():
     return {"message": "Electronic Dean's Office API"}
