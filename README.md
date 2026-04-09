@@ -12,3 +12,17 @@ docker compose up --build
 - API: http://localhost:3010
 - Документація (Swagger): http://localhost:3010/docs
 - Студенти: Максим Василенко, Ярина Смородська, Ростислав Бабенко, Даниїл Ткачук  |  Група: 231
+
+## Аутентифікація
+
+### Endpoints
+
+POST /auth/register
+
+POST /auth/login
+
+### Test users
+
+admin
+teacher01
+student01
