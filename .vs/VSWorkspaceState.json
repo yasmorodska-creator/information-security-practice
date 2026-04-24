@@ -2,8 +2,9 @@
   "ExpandedNodes": [
     "",
     "\\alembic",
-    "\\app"
+    "\\app",
+    "\\app\\routes"
   ],
-  "SelectedNode": "\\README.md",
+  "SelectedNode": "\\app\\main.py",
   "PreviewInSolutionExplorer": false
 }
