@@ -1,22 +1,37 @@
 import re
-from pydantic import BaseModel, EmailStr, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, EmailStr
 from datetime import datetime
 
 class UserCreate(BaseModel):
-    username: str = Field(..., min_length=3, maxlength=50, pattern=r"^[a-zA-Z0-9]+$")
-    email: EmailStr
+    """Схема реєстрації з суворою валідацією."""
+    username: str = Field(..., min_length=3, max_length=30, description="Логін: 3-30 символів, лише латиниця, цифри, підкреслення")
+    email: EmailStr = Field(...)
     password: str = Field(..., min_length=8, max_length=128)
-    full_name: str = Field(..., min_length=2, max_length=150)
+    full_name: str = Field(..., min_length=2, max_length=100)
+
+    @field_validator("username")
+    @classmethod
+    def validate_username(cls, v):
+        if not re.match(r"^[a-zA-Z0-9_]+$", v):
+            raise ValueError("Логін: лише латинські літери, цифри та _")
+        return v
+
+    @field_validator("full_name")
+    @classmethod
+    def validate_full_name(cls, v):
+        if re.search(r"[<>&\"']", v):
+            raise ValueError("Ім’я не може містити < > & \"")
+        return v.strip()
 
     @field_validator("password")
     @classmethod
     def validate_password_strength(cls, v):
         if not re.search(r"[A-Z]", v):
-            raise ValueError("Пароль має містити хоча б одну велику літеру")
+            raise ValueError("Потрібна хоча б одна велика літера")
         if not re.search(r"[a-z]", v):
-            raise ValueError("Пароль має містити хоча б одну малу літеру")
-        if not re.search(r"[0-9]", v):
-            raise ValueError("Пароль має містити хоча б одну цифру")
+            raise ValueError("Потрібна хоча б одна мала літера")
+        if not re.search(r"\d", v):
+            raise ValueError("Потрібна хоча б одна цифра")
         return v
 
 class UserResponse(BaseModel):
