@@ -3,8 +3,13 @@
     "",
     "\\alembic",
     "\\app",
-    "\\app\\routes"
+    "\\app\\ middleware",
+    "\\app\\auth",
+    "\\app\\crypto",
+    "\\app\\routes",
+    "\\app\\script",
+    "\\app\\validators"
   ],
-  "SelectedNode": "\\app\\main.py",
+  "SelectedNode": "\\app\\ middleware\\__init__.py",
   "PreviewInSolutionExplorer": false
 }
