@@ -1,4 +1,5 @@
-﻿from app.audit.middleware import AuditMiddleware
+﻿from app.audit.router import router as audit_router #прочитав - максимальний бал поставив
+from app.audit.middleware import AuditMiddleware
 from fastapi import FastAPI
 from app.database import Base, engine
 from app import models  # ★ Новий імпорт
@@ -34,6 +35,7 @@ from app.routes.admin import router as admin_router
 app.include_router(students_router)
 app.include_router(teachers_router)
 app.include_router(admin_router)
+app.include_router(audit_router, prefix="/admin", tags=["audit"])
 @app.get("/")
 def root():
     return {"message": "Electronic Dean's Office API"}
