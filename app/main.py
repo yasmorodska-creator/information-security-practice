@@ -1,9 +1,11 @@
-﻿from fastapi import FastAPI
+﻿from app.audit.middleware import AuditMiddleware
+from fastapi import FastAPI
 from app.database import Base, engine
 from app import models  # ★ Новий імпорт
 from app.routers import auth
 
 app = FastAPI(title="Electronic Dean's Office")
+app.add_middleware(AuditMiddleware)
 from fastapi.middleware.cors import CORSMiddleware
 from app.middleware.security_headers import SecurityHeadersMiddleware
 from app.middleware.rate_limiter import limiter
