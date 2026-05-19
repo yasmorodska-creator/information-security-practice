@@ -1,17 +1,23 @@
+version: '3.8'
+
 services:
   api:
     build: .
     container_name: dean_office_api
     ports:
-      - "3010:3010"
-    volumes:
-      - .:/app_code # Hot-reload коду
-      - db_data:/app_code/data # Персистентність БД
+      - "8000:8000"
     environment:
-      - PYTHONUNBUFFERED=1
-      - JWT_SECRET_KEY=my-dev-secret-key-32-chars-long!!
-      - ENCRYPTION_KEY=kKs8SbzBA16tNqmPK7MnpPXHo0rA9BnIQ1bcJpY8swk=   
+      - DATABASE_URL=sqlite:///./data/dekanat.db
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+      - ENCRYPTION_KEY=${ENCRYPTION_KEY}
+    volumes:
+      - ./data:/app/data
+    
+    # Security options (Вимоги безпеки з розділу 5.2)
+    read_only: true                 # Файлова система тільки для читання
+    tmpfs:
+      - /tmp                        # Тимчасова FS в оперативній пам'яті для Python
+    security_opt:
+      - no-new-privileges:true      # Заборона підвищення привілеїв (наприклад, через sudo)
+    
     restart: unless-stopped
-
-volumes:
-  db_data:
