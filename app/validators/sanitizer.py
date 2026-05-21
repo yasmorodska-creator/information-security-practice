@@ -2,12 +2,12 @@ import bleach
 import re
 
 def sanitize_text(text: str) -> str:
-    """Видаляє ВСІ HTML-теги з тексту."""
+    """пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅСІ HTML-пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ."""
     cleaned = bleach.clean(text, tags=[], strip=True)
     return cleaned.strip()
 
 def contains_sql_patterns(text: str) -> bool:
-    """Перевіряє наявність підозрілих SQL-патернів."""
+    """пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ SQL-пїЅпїЅпїЅпїЅпїЅпїЅпїЅ."""
     sql_patterns = [
         r"(\b(UNION|SELECT|INSERT|DELETE|DROP)\b)",
         r"(--|;\/\*|\*\/)",

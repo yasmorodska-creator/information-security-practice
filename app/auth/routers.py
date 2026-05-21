@@ -9,7 +9,7 @@ from app.auth.dependencies import get_current_user
 from app.schemas import UserCreate, UserResponse, TokenResponse, TokenRefreshRequest, UserInfo
 from app.security import hash_password, verify_password
 
-# Імпорти для аудиту та захисту
+# Imports for audit and security
 from app.audit.detector import check_brute_force
 from app.audit.logger import log_login_failed, log_login_success
 
@@ -18,9 +18,9 @@ router = APIRouter(prefix="/auth", tags=["Authentication"])
 @router.post("/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
 def register(user_data: UserCreate, db: Session = Depends(get_db)):
     if db.query(User).filter(User.username == user_data.username).first():
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Користувач вже існує")
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="User already exists")
     if db.query(User).filter(User.email == user_data.email).first():
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Email вже зареєстровано")
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Email already registered")
 
     new_user = User(
         username=user_data.username, 
@@ -39,27 +39,27 @@ def login(request: Request, credentials: dict, db: Session = Depends(get_db)):
     ip = request.client.host
     username = credentials.get("username")
     
-    # 1. Перевірка на Brute Force ДО перевірки в базі
+    # 1. Brute Force check BEFORE database verification
     if check_brute_force(db, ip):
         log_login_failed(db, username, ip, "brute_force_blocked")
         raise HTTPException(
             status_code=status.HTTP_429_TOO_MANY_REQUESTS, 
-            detail="Забагато невдалих спроб. Спробуйте пізніше."
+            detail="Too many failed attempts. Try again later."
         )
 
-    # 2. Пошук користувача та перевірка пароля
+    # 2. User lookup and password verification
     user = db.query(User).filter(User.username == username).first()
     if not user or not verify_password(credentials.get("password"), user.password_hash):
         log_login_failed(db, username, ip, "invalid_credentials")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, 
-            detail="Невірний логін або пароль"
+            detail="Invalid username or password"
         )
 
-    # 3. Логування успішного входу
+    # 3. Logging successful login
     log_login_success(db, user.id, user.username, ip)
 
-    # 4. Генерація токенів
+    # 4. Token generation
     role = user.roles[0].name if user.roles else "student"
     access_token = create_access_token(user.id, role)
     refresh_token = create_refresh_token(user.id)
@@ -72,15 +72,15 @@ def refresh_token(body: TokenRefreshRequest, db: Session = Depends(get_db)):
     try:
         payload = verify_token(body.refresh_token)
     except JWTError:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Невалідний refresh token")
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid refresh token")
 
     if payload.get("type") != "refresh":
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Потрібен refresh token, а не access token")
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Refresh token required, not access token")
 
     user_id = int(payload["sub"])
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
-        raise HTTPException(status_code=404, detail="Користувача не знайдено")
+        raise HTTPException(status_code=404, detail="User not found")
 
     role = user.roles[0].name if user.roles else "student"
     return TokenResponse(

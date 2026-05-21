@@ -3,8 +3,8 @@ from pydantic import BaseModel, Field, field_validator, EmailStr
 from datetime import datetime
 
 class UserCreate(BaseModel):
-    """Схема реєстрації з суворою валідацією."""
-    username: str = Field(..., min_length=3, max_length=30, description="Логін: 3-30 символів, лише латиниця, цифри, підкреслення")
+    """пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ."""
+    username: str = Field(..., min_length=3, max_length=30, description="пїЅпїЅпїЅпїЅ: 3-30 пїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
     email: EmailStr = Field(...)
     password: str = Field(..., min_length=8, max_length=128)
     full_name: str = Field(..., min_length=2, max_length=100)
@@ -13,25 +13,25 @@ class UserCreate(BaseModel):
     @classmethod
     def validate_username(cls, v):
         if not re.match(r"^[a-zA-Z0-9_]+$", v):
-            raise ValueError("Логін: лише латинські літери, цифри та _")
+            raise ValueError("пїЅпїЅпїЅпїЅ: пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ _")
         return v
 
     @field_validator("full_name")
     @classmethod
     def validate_full_name(cls, v):
         if re.search(r"[<>&\"']", v):
-            raise ValueError("Ім’я не може містити < > & \"")
+            raise ValueError("пїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ < > & \"")
         return v.strip()
 
     @field_validator("password")
     @classmethod
     def validate_password_strength(cls, v):
         if not re.search(r"[A-Z]", v):
-            raise ValueError("Потрібна хоча б одна велика літера")
+            raise ValueError("пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ")
         if not re.search(r"[a-z]", v):
-            raise ValueError("Потрібна хоча б одна мала літера")
+            raise ValueError("пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ")
         if not re.search(r"\d", v):
-            raise ValueError("Потрібна хоча б одна цифра")
+            raise ValueError("пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ")
         return v
 
 class UserResponse(BaseModel):

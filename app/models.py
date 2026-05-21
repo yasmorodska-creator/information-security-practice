@@ -4,7 +4,7 @@ from sqlalchemy.orm import relationship
 from app.database import Base
 from app.crypto.encryption import encrypt_field, decrypt_field
 
-# Зв’язок User <-> Role (M:N)
+# пїЅпїЅпїЅпїЅпїЅпїЅ User <-> Role (M:N)
 user_roles = Table(
     "user_roles",
     Base.metadata,
@@ -12,7 +12,7 @@ user_roles = Table(
     Column("role_id", Integer, ForeignKey("roles.id"), primary_key=True),
 )
 
-# Зв’язок Role <-> Permission (M:N)
+# пїЅпїЅпїЅпїЅпїЅпїЅ Role <-> Permission (M:N)
 role_permissions = Table(
     "role_permissions",
     Base.metadata,
@@ -32,16 +32,16 @@ class User(Base):
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     group_id = Column(Integer, ForeignKey("groups.id"), nullable=True)
 
-    # Зашифровані поля — у БД зберігається шифротекст
+    # пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅ пїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
     _encrypted_email = Column("encrypted_email", String, nullable=False)
     _encrypted_phone = Column("encrypted_phone", String, nullable=True)
 
-    # Зв'язки
+    # пїЅпїЅ'пїЅпїЅпїЅпїЅ
     roles = relationship("Role", secondary="user_roles", back_populates="users")
     group = relationship("Group", back_populates="students")
     grades = relationship("Grade", back_populates="student", foreign_keys="Grade.student_id")
 
-    # --- Прозорі властивості ---
+    # --- пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ ---
     @property
     def email(self) -> str:
         return decrypt_field(self._encrypted_email)
@@ -88,7 +88,7 @@ class Permission(Base):
         return f"<Permission {self.name}>"
 
 class Group(Base):
-    __tablename__ = "groups"  # ВИПРАВЛЕНО: додано __
+    __tablename__ = "groups"  # пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: пїЅпїЅпїЅпїЅпїЅпїЅ __
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String(20), unique=True, nullable=False)
     department = Column(String(100), nullable=False)
@@ -96,11 +96,11 @@ class Group(Base):
     
     students = relationship("User", back_populates="group")
 
-    def __repr__(self):  # ВИПРАВЛЕНО: додано __
+    def __repr__(self):  # пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: пїЅпїЅпїЅпїЅпїЅпїЅ __
         return f"<Group {self.name}>"
 
 class Subject(Base):
-    __tablename__ = "subjects"  # ВИПРАВЛЕНО: додано __
+    __tablename__ = "subjects"  # пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: пїЅпїЅпїЅпїЅпїЅпїЅ __
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String(150), nullable=False)
     credits = Column(Float, nullable=False)
@@ -108,11 +108,11 @@ class Subject(Base):
     
     grades = relationship("Grade", back_populates="subject")
 
-    def __repr__(self):  # ВИПРАВЛЕНО: додано __
+    def __repr__(self):  # пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: пїЅпїЅпїЅпїЅпїЅпїЅ __
         return f"<Subject {self.name}>"
 
 class Grade(Base):
-    __tablename__ = "grades"  # ВИПРАВЛЕНО: додано __
+    __tablename__ = "grades"  # пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: пїЅпїЅпїЅпїЅпїЅпїЅ __
     id = Column(Integer, primary_key=True, index=True)
     student_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     subject_id = Column(Integer, ForeignKey("subjects.id"), nullable=False)
@@ -124,5 +124,5 @@ class Grade(Base):
     subject = relationship("Subject", back_populates="grades")
     teacher = relationship("User", foreign_keys=[assigned_by])
 
-    def __repr__(self):  # ВИПРАВЛЕНО: додано __
+    def __repr__(self):  # пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: пїЅпїЅпїЅпїЅпїЅпїЅ __
         return f"<Grade student={self.student_id} subject={self.subject_id} grade={self.grade}>"

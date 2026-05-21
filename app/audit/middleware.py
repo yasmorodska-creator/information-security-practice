@@ -9,7 +9,7 @@ from app.audit.logger import log_event
 
 
 class AuditMiddleware(BaseHTTPMiddleware):
-    """Автоматично логує кожен HTTP-запит."""
+   
 
     SKIP_PATHS = {"/docs", "/openapi.json", "/redoc", "/favicon.ico"}
 
