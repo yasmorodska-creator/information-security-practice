@@ -6,7 +6,7 @@ from app.database import get_db
 from app.models import User
 from app.auth.jwt_handler import create_access_token, create_refresh_token, verify_token
 from app.auth.dependencies import get_current_user
-from app.schemas import UserCreate, UserResponse, TokenResponse, TokenRefreshRequest, UserInfo
+from app.schemas import UserCreate, UserResponse, LoginRequest, TokenResponse, TokenRefreshRequest, UserInfo
 from app.security import hash_password, verify_password
 
 # Imports for audit and security
@@ -19,12 +19,14 @@ router = APIRouter(prefix="/auth", tags=["Authentication"])
 def register(user_data: UserCreate, db: Session = Depends(get_db)):
     if db.query(User).filter(User.username == user_data.username).first():
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="User already exists")
-    if db.query(User).filter(User.email == user_data.email).first():
+
+    normalized_email = str(user_data.email).lower()
+    if any(user.email == normalized_email for user in db.query(User).all()):
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Email already registered")
 
     new_user = User(
         username=user_data.username, 
-        email=user_data.email, 
+        email=normalized_email,
         full_name=user_data.full_name, 
         password_hash=hash_password(user_data.password)
     )
@@ -35,9 +37,9 @@ def register(user_data: UserCreate, db: Session = Depends(get_db)):
 
 
 @router.post("/login", response_model=TokenResponse)
-def login(request: Request, credentials: dict, db: Session = Depends(get_db)):
+def login(request: Request, credentials: LoginRequest, db: Session = Depends(get_db)):
     ip = request.client.host
-    username = credentials.get("username")
+    username = credentials.username
     
     # 1. Brute Force check BEFORE database verification
     if check_brute_force(db, ip):
@@ -49,11 +51,18 @@ def login(request: Request, credentials: dict, db: Session = Depends(get_db)):
 
     # 2. User lookup and password verification
     user = db.query(User).filter(User.username == username).first()
-    if not user or not verify_password(credentials.get("password"), user.password_hash):
+    if not user or not verify_password(credentials.password, user.password_hash):
         log_login_failed(db, username, ip, "invalid_credentials")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, 
             detail="Invalid username or password"
+        )
+
+    if not user.is_active:
+        log_login_failed(db, username, ip, "inactive_user")
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="User account is disabled"
         )
 
     # 3. Logging successful login

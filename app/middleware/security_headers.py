@@ -6,9 +6,11 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next) -> Response:
         response = await call_next(request)
 
+        script_src = "'self' 'unsafe-inline'" if request.url.path == "/docs" else "'self'"
+
         response.headers["Content-Security-Policy"] = (
             "default-src 'self'; "
-            "script-src 'self'; "
+            f"script-src {script_src}; "
             "style-src 'self' 'unsafe-inline'; "
             "img-src 'self' data:; "
             "frame-ancestors 'none'"

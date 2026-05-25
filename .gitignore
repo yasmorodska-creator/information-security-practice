@@ -10,3 +10,4 @@ venv/
 .vscode/
 .vs/
 .env
+nginx/certs/*.key

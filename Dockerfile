@@ -24,9 +24,9 @@ ENV PATH="/opt/venv/bin:$PATH"
 COPY ./app ./app
 COPY ./scripts ./scripts
 COPY ./alembic ./alembic
+COPY ./static ./static
 COPY alembic.ini .
 COPY Dockerfile .
-COPY .gitignore .
 
 # 7. Створюємо директорію для даних з правами appuser
 RUN mkdir -p /app/data && chown -R appuser:appuser /app

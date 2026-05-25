@@ -7,8 +7,8 @@ services:
       - "8000:8000"
     environment:
       - DATABASE_URL=sqlite:///./data/dekanat.db
-      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
-      - ENCRYPTION_KEY=${ENCRYPTION_KEY}
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY:?JWT_SECRET_KEY is required}
+      - ENCRYPTION_KEY=${ENCRYPTION_KEY:?ENCRYPTION_KEY is required}
     volumes:
       - ./data:/app/data
     # Security options
