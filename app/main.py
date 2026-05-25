@@ -1,6 +1,9 @@
 
+from pathlib import Path
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.openapi.docs import get_swagger_ui_html
 from app.database import Base, engine
 from app import models  # ★ Новий імпорт
 
@@ -18,7 +21,25 @@ from app.routes.students import router as students_router
 from app.routes.teachers import router as teachers_router
 from app.routes.admin import router as admin_router
 
-app = FastAPI(title="Electronic Dean's Office")
+BASE_DIR = Path(__file__).resolve().parent.parent
+STATIC_DIR = BASE_DIR / "static"
+
+app = FastAPI(
+    title="Electronic Dean's Office",
+    docs_url=None,
+    redoc_url=None
+)
+
+app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
+
+@app.get("/docs", include_in_schema=False)
+async def custom_swagger_ui_html():
+    return get_swagger_ui_html(
+        openapi_url=app.openapi_url,
+        title=app.title + " - Swagger UI",
+        swagger_js_url="/static/swagger-ui-bundle.js",
+        swagger_css_url="/static/swagger-ui.css",
+    )
 
 # Підключаємо мідлварі
 app.add_middleware(AuditMiddleware)
